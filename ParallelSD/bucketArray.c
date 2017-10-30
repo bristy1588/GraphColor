@@ -1,5 +1,5 @@
 typedef struct bucketArray {
-	bucket *buckets;
+	bucket **buckets;
 	int colors;
 	int max_degree;
 } bucketArray;
@@ -15,7 +15,7 @@ std::pair<int, int> unpack_index(bucketArray *bucket_array, int index) {
 }
 
 // Find the largest size of a bucket in a given row
-static int paralle_find_index_max_size(bucket *buckets,
+static int parallel_find_index_max_size(bucket *buckets,
 								int left_index, int right_index) {
 	if (right_index - left_index < GRANULARITY) {
 		int max = left_index;
@@ -60,7 +60,7 @@ static int paralle_find_index_max_size(bucket *buckets,
 // TODO: Right now, we are blindly looking at all the buckets
 // Many of them will probably be empty, so it would be good if
 // we found a better way to do this check
-static int paralle_fine_index_max_sd(bucketArray *bucket_array, int left_index,
+static int parallel_find_index_max_sd(bucketArray *bucket_array, int left_index,
 							int right_index) {
 	if (right_index - left_index < GRANULARITY) {
 		for (int i = right_index; i >= left_index; i--) {
@@ -103,9 +103,13 @@ bucketArray* init_bucketArray(int colors, int max_degree) {
 
 int get_max_saturation_degree(bucketArray *bucket_array) {
 	// TODO: Any smart ways to optimize this?
-	return parallelFindIndexMaxSD(bucket_array, 0,
+	return parallel_find_index_max_sd(bucket_array, 0,
 								bucket_array->max_degree);
 }
 
+// A non-parallel version of inserting a vertex into bucket_array
+void insert_bucketArray(bucketArray *bucket_array, int color, int degree, int vertex_id) {
+  insert_bucket(bucket_array->buckets[index(bucket_array, color, degree)], &vertex_id, 1);
+}
 
-
+// TODO: Implement a parallel version of the above function
