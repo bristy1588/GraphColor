@@ -670,6 +670,190 @@ void orderVertices(sparseRowMajor<int,int>* _graph, unsigned int* _orderedVertic
       _orderedVertices[sdVertex[i].order] = i;
     }
   }
+  else if (_ordering.compare("SSD") == 0)
+  {    
+    int N = _graph->numRows;
+    orderVertices(_graph, _orderedVertices, std::string("LF"));
+    SDStruct *sdVertex = (SDStruct *) malloc(sizeof(SDStruct)*N);
+
+    int numColored = 0;
+    for (int i = 0; i < N; i++) {
+      sdVertex[i].effectiveDegree = 0;
+      sdVertex[i].saturationDegree = 0;
+      sdVertex[i].bitColor = 0L;
+      sdVertex[i].vertexID = i;
+      sdVertex[i].color = -1;
+      sdVertex[i].order = -1;
+      sdVertex[i].up = NULL;
+      sdVertex[i].down = NULL;
+      sdVertex[i].left = NULL;
+      sdVertex[i].right = NULL;
+    }
+
+    unsigned int maxColor = 0;
+    unsigned int maxSD = 0;
+
+    SDListType SDLists;
+    SDEDListType SDEDLists;
+    hashSetType largeColors;
+
+    for (unsigned int i = 0; i < N; i++) {
+      unsigned int vid = _orderedVertices[i];
+      if (sdVertex[vid].order == -1) {
+        maxSD = insertSDVertex(sdVertex, vid, maxSD, SDLists, SDEDLists);
+      }
+    }
+    
+    while (numColored < N) {
+      while (SDLists[maxSD]->order != -1) {
+        maxSD = deleteSDVertex(sdVertex, SDLists[maxSD]->vertexID, maxSD, SDLists, SDEDLists);
+      }
+      int vid = SDLists[maxSD]->vertexID;
+      
+      sdVertex[vid].order = numColored;
+      numColored++;
+      unsigned int color = 0;
+      unsigned long thisBitColor = 0L;
+      const unsigned long ALL_ONES = 0xFFFFFFFFFFFFFFFF;
+      if (sdVertex[vid].bitColor != ALL_ONES) {
+        color = findFirstBitSet(sdVertex[vid].bitColor ^ (sdVertex[vid].bitColor + 1));
+        thisBitColor = 1L << color;
+      } else {
+        unsigned char *colorArray = (unsigned char *) calloc(getDegree(_graph, vid) + 1, sizeof(unsigned char));
+        cilk_for (int i = 0; i < getDegree(_graph, vid); i++) {
+          int nbrID = getNeighbor(_graph, vid, i);
+          if ((sdVertex[nbrID].color <= getDegree(_graph, vid)) 
+              && (sdVertex[nbrID].color >= 0))
+            colorArray[sdVertex[nbrID].color] = 1;
+        }
+        while (colorArray[color] != 0) color++;
+      }
+      sdVertex[vid].color = color;
+      maxSD = deleteSDVertex(sdVertex, vid, maxSD, SDLists, SDEDLists);
+      if (color > maxColor) {
+        maxColor = color;
+      }
+      cilk_for (int i = 0; i < getDegree(_graph, vid); i++) {
+        unsigned int nbrID = getNeighbor(_graph, vid,i);
+        if (sdVertex[nbrID].order == -1) {
+          maxSD = deleteSDVertex(sdVertex, nbrID, maxSD, SDLists, SDEDLists);
+
+          sdVertex[nbrID].effectiveDegree--;
+          // if nbrID wasn't deferred, update saturationDegree and re-insert
+
+          if (color < 64) {
+            if ((sdVertex[nbrID].bitColor & thisBitColor) == 0L) {
+              sdVertex[nbrID].bitColor |= thisBitColor;
+              sdVertex[nbrID].saturationDegree++;
+            }
+          } else {
+            unsigned long vertexIDAndColor = packUnsignedInts(nbrID, color);
+            if (largeColors.count(vertexIDAndColor) == 0) {
+              largeColors.insert(vertexIDAndColor);
+              sdVertex[nbrID].saturationDegree++;
+            }
+          }     
+          // reinsert nbr w/ new saturation and effective degrees
+          maxSD = insertSDVertex(sdVertex, nbrID, maxSD, SDLists, SDEDLists);
+        }          
+      }
+    }
+    for (int i = 0; i < N; i++) {
+      _orderedVertices[sdVertex[i].order] = i;
+    }
+  }
+	else if (_ordering.compare("MSD") == 0)
+  {    
+    int N = _graph->numRows;
+    orderVertices(_graph, _orderedVertices, std::string("LF"));
+    SDStruct *sdVertex = (SDStruct *) malloc(sizeof(SDStruct)*N);
+
+    int numColored = 0;
+    for (int i = 0; i < N; i++) {
+      sdVertex[i].effectiveDegree = 0;
+      sdVertex[i].saturationDegree = 0;
+      sdVertex[i].bitColor = 0L;
+      sdVertex[i].vertexID = i;
+      sdVertex[i].color = -1;
+      sdVertex[i].order = -1;
+      sdVertex[i].up = NULL;
+      sdVertex[i].down = NULL;
+      sdVertex[i].left = NULL;
+      sdVertex[i].right = NULL;
+    }
+
+    unsigned int maxColor = 0;
+    unsigned int maxSD = 0;
+
+    SDListType SDLists;
+    SDEDListType SDEDLists;
+    hashSetType largeColors;
+
+    for (unsigned int i = 0; i < N; i++) {
+      unsigned int vid = _orderedVertices[i];
+      if (sdVertex[vid].order == -1) {
+        maxSD = insertSDVertex(sdVertex, vid, maxSD, SDLists, SDEDLists);
+      }
+    }
+    
+    while (numColored < N) {
+      while (SDLists[maxSD]->order != -1) {
+        maxSD = deleteSDVertex(sdVertex, SDLists[maxSD]->vertexID, maxSD, SDLists, SDEDLists);
+      }
+      int vid = SDLists[maxSD]->vertexID;
+      
+      sdVertex[vid].order = numColored;
+      numColored++;
+      unsigned int color = 0;
+      unsigned long thisBitColor = 0L;
+      const unsigned long ALL_ONES = 0xFFFFFFFFFFFFFFFF;
+      if (sdVertex[vid].bitColor != ALL_ONES) {
+        color = findFirstBitSet(sdVertex[vid].bitColor ^ (sdVertex[vid].bitColor + 1));
+        thisBitColor = 1L << color;
+      } else {
+        unsigned char *colorArray = (unsigned char *) calloc(getDegree(_graph, vid) + 1, sizeof(unsigned char));
+        for (int i = 0; i < getDegree(_graph, vid); i++) {
+          int nbrID = getNeighbor(_graph, vid, i);
+          if ((sdVertex[nbrID].color <= getDegree(_graph, vid)) 
+              && (sdVertex[nbrID].color >= 0))
+            colorArray[sdVertex[nbrID].color] = 1;
+        }
+        while (colorArray[color] != 0) color++;
+      }
+      sdVertex[vid].color = color;
+      maxSD = deleteSDVertex(sdVertex, vid, maxSD, SDLists, SDEDLists);
+      if (color > maxColor) {
+        maxColor = color;
+      }
+      for (int i = 0; i < getDegree(_graph, vid); i++) {
+        unsigned int nbrID = getNeighbor(_graph, vid,i);
+        if (sdVertex[nbrID].order == -1) {
+          maxSD = deleteSDVertex(sdVertex, nbrID, maxSD, SDLists, SDEDLists);
+
+          //sdVertex[nbrID].effectiveDegree--;
+          // if nbrID wasn't deferred, update saturationDegree and re-insert
+
+          if (color < 64) {
+            if ((sdVertex[nbrID].bitColor & thisBitColor) == 0L) {
+              sdVertex[nbrID].bitColor |= thisBitColor;
+              sdVertex[nbrID].saturationDegree++;
+            }
+          } else {
+            unsigned long vertexIDAndColor = packUnsignedInts(nbrID, color);
+            if (largeColors.count(vertexIDAndColor) == 0) {
+              largeColors.insert(vertexIDAndColor);
+              sdVertex[nbrID].saturationDegree++;
+            }
+          }     
+          // reinsert nbr w/ new saturation and effective degrees
+          maxSD = insertSDVertex(sdVertex, nbrID, maxSD, SDLists, SDEDLists);
+        }          
+      }
+    }
+    for (int i = 0; i < N; i++) {
+      _orderedVertices[sdVertex[i].order] = i;
+    }
+  }
   else if (_ordering.compare("SL") == 0) {
     const bool random_tie_breaking = true;
     unsigned int *priorities = (unsigned int *) malloc(sizeof(unsigned int)*_graph->numRows);

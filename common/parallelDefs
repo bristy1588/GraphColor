@@ -46,7 +46,7 @@ PCFLAGS = -O3 -DCILKP $(INTT) $(SDSLCF)
 PLFLAGS = $(SDSLLF)
 
 else
-PCC = g++
+PCC = clang++
 PLFLAGS = $(LFLAGS) $(SDSLLF)
 PCFLAGS = -O2 $(INTT) $(SDSLCF)
 endif

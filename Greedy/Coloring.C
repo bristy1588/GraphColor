@@ -28,11 +28,11 @@
 #include "graphColorGreedy.h"
 using namespace std;
 
-intT* graphColoring(sparseRowMajor<int, int> G) {
+intT* graphColoring(sparseRowMajor<int, int> G, std::string _ordering) {
   intT *Colors = newA(intT,G.numRows);
 
   //int m = colorGraphR(Remain,G.V,Flags.A,Colors,0,round,round+100);
-  int m = colorGraphGreedy(&G, (int *) Colors, "R");
+  int m = colorGraphGreedy(&G, (int *) Colors, _ordering);
 
   cout << "Colors = " << m << endl;
   return Colors;

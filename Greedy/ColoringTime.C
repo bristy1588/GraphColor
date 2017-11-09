@@ -34,15 +34,15 @@
 using namespace std;
 using namespace benchIO;
 
-void timeColoring(graph<int> G, int rounds, char* outFile) {
+void timeColoring(graph<int> G, int rounds, char* outFile, char* ordering) {
   sparseRowMajor<int,int> H = sparseFromGraph<int>(G); //because code might modify graph
-  intT* colors = graphColoring(H);
+  intT* colors = graphColoring(H, ordering);
   for (int i=0; i < rounds; i++) {
     free(colors);
     H.del();
     H = sparseFromGraph<int>(G);
     startTime();
-    colors = graphColoring(H);
+    colors = graphColoring(H, ordering);
     nextTimeN();
   }
   cout << endl;
@@ -57,10 +57,11 @@ void timeColoring(graph<int> G, int rounds, char* outFile) {
 }
 
 int parallel_main(int argc, char* argv[]) {
-  commandLine P(argc, argv, "[-o <outFile>] [-r <rounds>] <inFile>");
-  char* iFile = P.getArgument(0);
+  commandLine P(argc, argv, "[-o <outFile>] [-r <rounds>] <inFile> <ordering>");
+  char* iFile = P.getArgument(1);
+  char* ordering = P.getArgument(0);
   char* oFile = P.getOptionValue("-o");
   int rounds = P.getOptionIntValue("-r",1);
   graph<int> G = readGraphFromFile<int>(iFile);
-  timeColoring(G, rounds, oFile);
+  timeColoring(G, rounds, oFile, ordering);
 }
