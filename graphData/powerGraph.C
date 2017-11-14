@@ -60,7 +60,7 @@ graph<intT> makePowerGraph(intT n) {
   parallel_for(intT i=0; i < n; i++) {
     V[i].degree = degree;
     V[i].Neighbors = ngh + i * degree;
-  }  
+  }
 
   graph<intT> G = graph<intT>(V, n, degree*n, ngh);
 
@@ -79,10 +79,10 @@ graph<intT> makePowerGraph(intT n) {
   for (intT i=0; i < sites; i++) {
     for (intT j =0; j < sizes[i]; j++) {
       for (intT k = 0; k < degree; k++) {
-	intT target_site = (random() % inRatio != 0) ? i : (random() % sites);
-	intT site_id = random() % sizes[target_site];
-	intT idx = offsets[i] + j;
-	G.V[idx].Neighbors[k] = offsets[target_site] + site_id;
+        intT target_site = (random() % inRatio != 0) ? i : (random() % sites);
+        intT site_id = random() % sizes[target_site];
+        intT idx = offsets[i] + j;
+        G.V[idx].Neighbors[k] = offsets[target_site] + site_id;
       }
     }
   }

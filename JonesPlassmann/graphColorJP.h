@@ -76,4 +76,4 @@ intT colorGraphJP(
   return maxColor + 1;
 }
  
-#endif _GRAPH_COLOR_JP_H
+#endif // _GRAPH_COLOR_JP_H

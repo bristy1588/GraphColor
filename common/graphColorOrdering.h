@@ -62,4 +62,4 @@ int calculateSLLPriorities(sparseRowMajor<int,int>* _graph, unsigned int *_prior
 void orderVertices(sparseRowMajor<int,int>* _graph, unsigned int* _orderedVertices, std::string _ordering, unsigned int _randVal = SEED_VALUE);
 
 
-#endif _GRAPH_COLOR_ORDERING_H 
+#endif // _GRAPH_COLOR_ORDERING_H 
