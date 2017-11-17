@@ -53,13 +53,13 @@ static void setWorkers(int n) { omp_set_num_threads(n); }
 
 // c++
 #else
-#define cilk_spawn
-#define cilk_sync
+// #define cilk_spawn
+// #define cilk_sync
 #define parallel_main main
 #define parallel_for for
 #define parallel_for_1 for
 #define parallel_for_256 for
-#define cilk_for for
+// #define cilk_for for
 
 static int getWorkers() { return 1; }
 static void setWorkers(int n) { }

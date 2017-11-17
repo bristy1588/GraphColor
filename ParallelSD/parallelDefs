@@ -25,5 +25,5 @@ PLFLAGS =
 else
 PCC = clang++
 PLFLAGS = $(LFLAGS)
-PCFLAGS = -mcx16 -O2 -DMCX16 $(INTT)
+PCFLAGS = -O2 -DCILKP -fcilkplus $(INTT)
 endif

@@ -28,19 +28,21 @@ def stripFloat(val) :
   trunc = float(int(val*1000))/1000
   return str(trunc).rstrip('0')    
 
-def runSingle(runProgram, options, ifile, procs) :
-  comString = "./"+runProgram+" "+options+" "+ifile
+def runSingle(runProgram, options, ifile, procs, ordering) :
+  print(options)
+  comString = "./"+runProgram+" "+options+" "+ifile+" "+ordering
   if (procs > 0) :
     comString = onPprocessors(comString,procs)
+  print(comString, "command")
   out = shellGetOutput(comString)
-  #print(out)
+  print(out)
   try:
     times = [float(str[str.index(' ')+1:]) for str in out.split('\n') if str.startswith("PBBS-time: ")]
     return times
   except (ValueError,IndexError):
     raise NameError(comString+"\n"+out)
 
-def runTest(runProgram, checkProgram, dataDir, test, rounds, procs, noOutput) :
+def runTest(runProgram, checkProgram, dataDir, test, rounds, procs, noOutput, ordering) :
     random.seed()
     outFile="/tmp/ofile%d_%d" %(random.randint(0, 1000000), random.randint(0, 1000000)) 
     [weight, inputFileNames, runOptions, checkOptions] = test
@@ -53,7 +55,7 @@ def runTest(runProgram, checkProgram, dataDir, test, rounds, procs, noOutput) :
     runOptions = runOptions + " -r " + `rounds`
     if (noOutput == 0) :
       runOptions = runOptions + " -o " + outFile
-    times = runSingle(runProgram, runOptions, longInputNames, procs)
+    times = runSingle(runProgram, runOptions, longInputNames, procs, ordering)
     if (noOutput == 0) :
       checkString = ("./" + checkProgram + " " + checkOptions + " "
                      + longInputNames + " " + outFile)
@@ -78,12 +80,12 @@ def averageTime(times) :
     
 
 def timeAll(name, runProgram, checkProgram, dataDir, tests, rounds, procs, noOutput,
-            addToDatabase, problem) :
+            addToDatabase, problem, ordering) :
   totalTime = 0
   totalWeight = 0
   try:
     results = [runTest(runProgram, checkProgram, dataDir, test, rounds, procs,
-                       noOutput)
+                       noOutput, ordering)
                for test in tests]
     totalTimeMean = 0
     totalTimeMin = 0
@@ -144,10 +146,11 @@ def getArgs() :
   rounds = int(getArg("-r", 1))
   return (noOutput, rounds, addToDatabase, processors)
 
-def timeAllArgs(runProgram, problem, checkProgram, dataDir, tests) :
-    (noOutput, rounds, addToDatabase, procs) = getArgs()
-    name = os.path.basename(os.getcwd())
-    timeAll(name, runProgram, checkProgram, dataDir, tests, rounds, procs, noOutput, addToDatabase, problem)
+def timeAllArgs(runProgram, problem, checkProgram, dataDir, tests, ordering) :
+		(noOutput, rounds, addToDatabase, procs) = getArgs()
+		name = os.path.basename(os.getcwd())
+		timeAll(name, runProgram, checkProgram, dataDir, tests, rounds, procs, noOutput, addToDatabase, problem, ordering)
+
 
 #
 # Database insertions

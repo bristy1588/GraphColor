@@ -33,6 +33,7 @@ def runSingle(runProgram, options, ifile, procs, ordering) :
   comString = "./"+runProgram+" "+options+" "+ifile+" "+ordering
   if (procs > 0) :
     comString = onPprocessors(comString,procs)
+	print(comString, "command")
   out = shellGetOutput(comString)
   print(out)
   try:
