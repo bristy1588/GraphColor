@@ -2,6 +2,7 @@
 #include "bucketArray.h"
 #include "bucket.h"
 #include "parallel.h"
+#include "cilk/cilk.h"
 
 static const int GRANULARITY = 4096;
 
@@ -33,7 +34,7 @@ static int parallel_find_index_max_size(bucket **buckets,
 			return max;
 		}
 	} else {
-		cilk_spawn int max_left = parallel_find_index_max_size(buckets, 
+		int max_left = cilk_spawn parallel_find_index_max_size(buckets, 
 									left_index, 
 									(left_index + right_index) / 2);
 		int max_right = parallel_find_index_max_size(buckets,
@@ -76,7 +77,7 @@ static int parallel_find_index_max_sd(bucketArray *bucket_array, int left_index,
 		}
 		return -1;
 	} else {
-		cilk_spawn int max_left = parallel_find_index_max_sd(
+		int max_left = cilk_spawn parallel_find_index_max_sd(
 									bucket_array, left_index,
 									(left_index + right_index) / 2);
 		int max_right = parallel_find_index_max_sd(bucket_array,

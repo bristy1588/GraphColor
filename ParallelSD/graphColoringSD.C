@@ -49,7 +49,7 @@ static int parallelFindMaxDegree(sparseRowMajor<int, int> *_graph,
 		}
 		return max;
 	} else {
-		cilk_spawn int max_left = parallelFindMaxDegree(_graph, left_index,
+		int max_left = cilk_spawn parallelFindMaxDegree(_graph, left_index,
 										(left_index + right_index) / 2);
 		int max_right = parallelFindMaxDegree(_graph,
 						(left_index + right_index) / 2 + 1, right_index);
@@ -67,7 +67,7 @@ static int count(char *counters, int left_index, int right_index) {
     }
     return res;
   } else {
-    cilk_spawn int res1 = count(counters, left_index, (left_index + right_index) / 2);
+    int res1 = cilk_spawn count(counters, left_index, (left_index + right_index) / 2);
     int res2 = count(counters, (left_index + right_index) / 2 + 1, right_index);
     cilk_sync;
 

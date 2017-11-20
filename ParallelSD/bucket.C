@@ -7,6 +7,7 @@ bucket* init_bucket() {
 	new_bucket->vertices = (int *) malloc(sizeof(int));
 	new_bucket->size = 0;
 	new_bucket->capacity = 1;
+	return new_bucket;
 }
 
 static void free_bucket(bucket *bucket) {

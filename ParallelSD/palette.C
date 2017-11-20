@@ -22,9 +22,9 @@ bool set_color(palette *palette, int color) {
   if (color < 64) {
     return helper_set_color(palette, 0, color);
   } else if (color < 128) {
-    helper_set_color(palette, 1, color - 64);
+    return helper_set_color(palette, 1, color - 64);
   } else {
-    helper_set_color(palette, color / 64, color % 64);
+    return helper_set_color(palette, color / 64, color % 64);
   }
 }
 
