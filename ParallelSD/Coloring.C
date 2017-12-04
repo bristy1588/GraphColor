@@ -28,12 +28,12 @@
 #include "graphColoringSD.h"
 using namespace std;
 
-int* graphColoring(sparseRowMajor<int, int> G, std::string _ordering) {
-  int *Colors = newA(int, G.numRows);
+intT* graphColoring(sparseRowMajor<int, int> G, std::string _ordering) {
+  intT *Colors = newA(int, G.numRows);
 
-  //int m = colorGraphR(Remain,G.V,Flags.A,Colors,0,round,round+100);
-  int m = colorSD(&G, _ordering);
-
-  cout << "Colors = " << m << endl;
+  // int m = colorGraphR(Remain,G.V,Flags.A,Colors,0,round,round+100);
+  int m = colorSD(&G, Colors, _ordering);
+  // int m  = 2;
+  cout << " SD Colors = " << m << endl;
   return Colors;
 }

@@ -1,4 +1,6 @@
 #include "graphColorJP.h"
+#include <iostream>
+using namespace std;
 
 inline unsigned long LeafClass::updateLeafCounter(unsigned long _bitColor)
 {
@@ -748,5 +750,6 @@ void colorGraphJP(
   unsigned int _seed)
 {
   colorGraphJPInit(_graph, _vertices, _tournamentArray, _ordering, _seed);
+  cout << " GP Init Finished" <<endl;
   JP(_graph, _vertices, _tournamentArray);
 }

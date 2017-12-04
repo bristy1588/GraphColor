@@ -48,7 +48,7 @@ void timeColoring(graph<int> G, int rounds, char* outFile, char *ordering) {
   cout << endl;
 
   if (outFile != NULL) {
-		printf("alabala\n");
+		//printf("alabala\n");
     writeIntArrayToFile(colors, G.n, outFile);
   }
 
